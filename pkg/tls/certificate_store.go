@@ -205,18 +205,11 @@ func appendCertificate(certs map[string]map[string]*CertificateData, subjectAltN
 	sort.Strings(subjectAltNames)
 	certKey := strings.Join(subjectAltNames, ",")
 
-	certExists := false
 	if certs[storeName] == nil {
 		certs[storeName] = make(map[string]*CertificateData)
-	} else {
-		for domains := range certs[storeName] {
-			if domains == certKey {
-				certExists = true
-				break
-			}
-		}
 	}
-	if certExists {
+
+	if _, exists := certs[storeName][certKey]; exists {
 		log.Debug().Msgf("Skipping addition of certificate for domain(s) %q, to TLS Store %s, as it already exists for this store.", certKey, storeName)
 	} else {
 		log.Debug().Msgf("Adding certificate for domain(s) %s", certKey)

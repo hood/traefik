@@ -128,3 +128,20 @@ func loadTestCert(certName string, uppercase bool) (*tls.Certificate, error) {
 
 	return &staticCert, nil
 }
+
+func TestAppendCertificate(t *testing.T) {
+	first := &CertificateData{Hash: "first"}
+	duplicate := &CertificateData{Hash: "duplicate"}
+	other := &CertificateData{Hash: "other"}
+
+	certs := map[string]map[string]*CertificateData{}
+	appendCertificate(certs, []string{"b.example.com", "a.example.com"}, "default", first)
+	appendCertificate(certs, []string{"a.example.com", "b.example.com"}, "default", duplicate)
+	appendCertificate(certs, []string{"a.example.com", "b.example.com"}, "other", other)
+
+	expected := map[string]map[string]*CertificateData{
+		"default": {"a.example.com,b.example.com": first},
+		"other":   {"a.example.com,b.example.com": other},
+	}
+	assert.Equal(t, expected, certs)
+}
